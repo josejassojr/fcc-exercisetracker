@@ -84,30 +84,91 @@ app.get("/api/users", function (req, res) {
   })
 });
 
-// POST request to /api/user/:id/exercises sends exercise document to DB with properties: _id, date, duration, and description
+// POST request to /api/users/:id/exercises sends exercise document to DB with properties: _id, date, duration, and description
 app.post("/api/users/:_id/exercises", function (req, res) {
-  let createdExercise = new exercise();
-  createdExercise.userID = req.params._id;
-  createdExercise.date = convertToDateString(req.body.date);
-  createdExercise.duration = req.body.duration;
-  createdExercise.description = req.body.description;
-  createdExercise.save(function handleSaveExercise(err, data) {
+  console.log(req.body);
+  console.log(req.params._id);
+  if (req.body.description === "") {
+    return res.send("'Description' is required.")
+  } else if (req.body.duration === "") {
+    return res.send("'Duration' is required.")
+  }
+  user.findById(req.params._id, function handleFindUser(err, data) {
     if (err) {
       console.log(err);
-      console.error("error in creating and saving new exercise");
-      return res.json({ error: "could not save exercise" });
-    } else {
-      console.log(data);
-      return res.json({
-        _id: data.userID,
-        date: data.date,
-        duration: data.duration,
-        description: data.description
-      });
+      console.log("Error Finding User by ID");
+      return res.send("Error Finding User by ID");
+    } else if (data === null) { // did not find User with that ID
+      return res.send("Unknown UserID");
+    } else { // User found. Proceed to save Exercise.
+      let createdExercise = new exercise();
+      createdExercise.userID = req.params._id;
+      createdExercise.date = convertToDateString(req.body.date);
+      createdExercise.duration = req.body.duration;
+      createdExercise.description = req.body.description;
+      const foundUsername = data.username;
+      createdExercise.save(function handleSaveExercise(err, data) {
+        if (err) {
+          console.log(err);
+          console.log("error in creating and saving new exercise");
+          return res.json({ error: "could not save exercise" });
+        } else {
+          console.log(data);
+          return res.json({
+            _id: data.userID,
+            username: foundUsername,
+            date: data.date,
+            duration: data.duration,
+            description: data.description
+          });
+        }
+      })
     }
-  })
+  });
 });
 
+// If no _id is input to post exercise.
+app.post("/api/users//exercises", function (req, res) {
+  res.send("need ID");
+})
+
+// GET request to /api/users/:id/logs responds with user and log of all user's exercises
+app.get("/api/users/:_id/logs", function (req, res) {
+  console.log(req.params._id);
+  user.findById(req.params._id, function handleFindUserForLogs(err, data) {
+    if (err) {
+      console.log(err);
+      console.log("Error finding user by ID");
+      return res.send("Error Finding User");
+    } else if (data === null) {
+      console.log("No user found with this ID");
+      return res.send("No User found with ID: " + req.params._id);
+    } else {
+      const foundUsername = data.username;
+      const foundUserID = data._id;
+      exercise.find({ userID: foundUserID }, function handleFoundExerciseLog(err, data) {
+        if (err) {
+          console.log(err);
+          console.log("Error in finding Exercise Log");
+          return res.send("Error in finding Exercise Log");
+        } else {
+          const exerciseLog = data.map(exer => ({
+            description: exer.description,
+            duration: exer.duration,
+            date: exer.date
+          }));
+          const logCount = exerciseLog.length;
+          return res.json({
+            _id: foundUserID,
+            username: foundUsername,
+            count: logCount,
+            log: exerciseLog
+          })
+        }
+      })
+    }
+  });
+});
 // OTHER FUNCTIONS
 
 // Converts given input into proper String representing the date to be for use in saving exercises to database
