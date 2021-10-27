@@ -5,7 +5,7 @@ const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose');
 var bodyParser = require("body-parser");
-require("dotenv").config({ path: "file.env" });
+require("dotenv").config({ path: "sample.env" });
 
 app.use(cors());
 app.use(express.static('public'));
@@ -133,7 +133,8 @@ app.post("/api/users//exercises", function (req, res) {
 })
 
 // GET request to /api/users/:id/logs responds with user and log of all user's exercises
-app.get("/api/users/:_id/logs", function (req, res) {
+app.get("/api/users/:_id/logs?[from][&to][&limit]", function(req, res) {
+  console.log(req.params);
   console.log(req.params._id);
   user.findById(req.params._id, function handleFindUserForLogs(err, data) {
     if (err) {
@@ -146,7 +147,10 @@ app.get("/api/users/:_id/logs", function (req, res) {
     } else {
       const foundUsername = data.username;
       const foundUserID = data._id;
-      exercise.find({ userID: foundUserID }, function handleFoundExerciseLog(err, data) {
+      exercise.find({ userID: foundUserID }, function handleFoundExerciseLog(
+        err,
+        data
+      ) {
         if (err) {
           console.log(err);
           console.log("Error in finding Exercise Log");
@@ -163,12 +167,19 @@ app.get("/api/users/:_id/logs", function (req, res) {
             username: foundUsername,
             count: logCount,
             log: exerciseLog
-          })
+          });
         }
-      })
+      });
     }
   });
 });
+
+// // GET request to /api/users/:_id/logs?[from][&to][&limit] responds with user and log of user's exercises within dates and set to limited number
+// app.get("/api/users/:_id/logs?[from][&to][&limit]", function (req, res) {
+//   console.log(req.params);
+//   res.send("Hello");
+// });
+
 // OTHER FUNCTIONS
 
 // Converts given input into proper String representing the date to be for use in saving exercises to database
