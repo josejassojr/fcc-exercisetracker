@@ -133,9 +133,10 @@ app.post("/api/users//exercises", function (req, res) {
 })
 
 // GET request to /api/users/:id/logs responds with user and log of all user's exercises
-app.get("/api/users/:_id/logs?[from][&to][&limit]", function(req, res) {
+app.get("/api/users/:_id/logs", function(req, res) {
   console.log(req.params);
   console.log(req.params._id);
+  console.log(req.query);
   user.findById(req.params._id, function handleFindUserForLogs(err, data) {
     if (err) {
       console.log(err);
@@ -156,23 +157,27 @@ app.get("/api/users/:_id/logs?[from][&to][&limit]", function(req, res) {
           console.log("Error in finding Exercise Log");
           return res.send("Error in finding Exercise Log");
         } else {
-          const exerciseLog = data.map(exer => ({
+          let exerciseLog = data.map(exer => ({
             description: exer.description,
             duration: exer.duration,
             date: exer.date
           }));
-          const logCount = exerciseLog.length;
-          return res.json({
-            _id: foundUserID,
-            username: foundUsername,
-            count: logCount,
-            log: exerciseLog
-          });
+          return res.json(paramsToFilteredLog(req.query.from, req.query.to, req.query.limit, exerciseLog, foundUsername, foundUserID));
+          // const logCount = exerciseLog.length;
+          // return res.json({
+          //   _id: foundUserID,
+          //   username: foundUsername,
+          //   count: logCount,
+          //   log: exerciseLog
+          // });
         }
       });
     }
   });
 });
+
+// REGEX PATTERN FOR YYYY-MM-DD
+// ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$ 
 
 // // GET request to /api/users/:_id/logs?[from][&to][&limit] responds with user and log of user's exercises within dates and set to limited number
 // app.get("/api/users/:_id/logs?[from][&to][&limit]", function (req, res) {
@@ -197,6 +202,137 @@ function convertToDateString(input) {
   ];
   return new Date(utc_date).toDateString();
 }
+
+// Returns Object from given Parameters: From Date, To Date, Limit, Log, username, userID
+function paramsToFilteredLog(from, to, limit, log, username, userID) {
+  let retLog = log
+  // console.log(retLog);
+  // console.log(new Date(from));
+  // console.log(new Date(to));
+  let x = "";
+  if (new Date(from) != "Invalid Date") {
+    x += "f"
+    var retFrom = convertDateToUTCDate(new Date(from));
+    retLog = retLog.filter(item => new Date(item.date) >= retFrom);
+    // console.log(retLog);
+  }
+  if (new Date(to) != "Invalid Date") {
+    x += "t"
+    var retTo = convertDateToUTCDate(new Date(to));
+    retLog = retLog.filter(item => new Date(item.date) <= retTo);
+    // console.log(retLog);
+  }
+  if (limit !== undefined) {
+    retLog = retLog.slice(0, limit);
+    // console.log(retLog);
+  }
+  const logCount = retLog.length
+  // console.log(x)
+  switch (x) {
+    case "f":
+      return {
+        _id: userID,
+        username: username,
+        from: retFrom.toDateString(),
+        count: logCount,
+        log: retLog
+      };
+    case "ft":
+      return {
+        _id: userID,
+        username: username,
+        from: retFrom.toDateString(),
+        to: retTo.toDateString(),
+        count: logCount,
+        log: retLog
+      };
+    case 't':
+      return {
+        _id: userID,
+        username: username,
+        to: retTo.toDateString(),
+        count: logCount,
+        log: retLog
+      };
+    default:
+      return {
+        _id: userID,
+        username: username,
+        count: logCount,
+        log: retLog
+      };
+  }
+}
+
+//  Converts Date to UTC Date
+function convertDateToUTCDate(date) {
+  utc_date = [date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate()];
+  return new Date(utc_date);
+}
+
+
+// Tests
+
+// function testParamsToFilteredLog() {
+//   const startingLog = [
+//     { description: "Testing", duration: 1, date: "Tue Oct 26 2021" },
+//     { description: "Testing", duration: 2, date: "Tue Oct 26 2021" },
+//     { description: "Testing", duration: 3, date: "Tue Oct 26 2021" },
+//     { description: "Testing", duration: 4, date: "Tue Oct 26 2021" },
+//     { description: "Testing", duration: 5, date: "Tue Oct 26 2021" },
+//     { description: "Testing", duration: 6, date: "Tue Oct 26 2021" },
+//     { description: "Testing", duration: 7, date: "Tue Oct 26 2021" },
+//     { description: "Testing", duration: 8, date: "Sat Oct 23 2021" },
+//     { description: "Testing", duration: 9, date: "Fri Oct 22 2021" },
+//     { description: "Testing", duration: 10, date: "Thu Oct 21 2021" },
+//     { description: "Testing", duration: 11, date: "Mon Mar 22 2021" },
+//     { description: "Testing", duration: 12, date: "Mon Mar 22 2021" },
+//     { description: "Testing", duration: 13, date: "Sun Oct 21 2001" },
+//     { description: "Testing", duration: 14, date: "Sun Oct 21 2001" }
+//   ];
+//   console.log( 
+//     paramsToFilteredLog( // Just From Date
+//       "2021-10-21",
+//       undefined,
+//       undefined,
+//       startingLog,
+//       "jose",
+//       "6172632df70de605622a9c83"
+//     )
+//   );
+//   console.log(
+//     paramsToFilteredLog( // From and To Date
+//       "2021-10-21",
+//       "2021-10-23",
+//       undefined,
+//       startingLog,
+//       "jose",
+//       "6172632df70de605622a9c83"
+//     )
+//   );
+//   console.log(
+//     paramsToFilteredLog( // Just To Date
+//       undefined,
+//       "2021-10-23",
+//       undefined,
+//       startingLog,
+//       "jose",
+//       "6172632df70de605622a9c83"
+//     )
+//   );
+//   console.log(
+//     paramsToFilteredLog( // All Three
+//       "2021-10-21",
+//       "2021-10-23",
+//       1,
+//       startingLog,
+//       "jose",
+//       "6172632df70de605622a9c83"
+//     )
+//   );
+// }
+
+// testParamsToFilteredLog();
 
 // Tests for convertToDateString()
 // console.log(convertToDateString("12/12"));
