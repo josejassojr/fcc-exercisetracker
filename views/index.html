@@ -1,61 +1,71 @@
 <!DOCTYPE html>
 <html>
+
   <head>
-    <title>Exercise Tracker | freeCodeCamp</title>
-    <link rel="shortcut icon" href="https://cdn.freecodecamp.org/universal/favicons/favicon.ico"  type="image/x-icon" />
+    <title>Exercise Tracker</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
     <link href="style.css" rel="stylesheet" type="text/css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap" rel="stylesheet">
   </head>
 
   <body>
     <div class="container">
-      <h1>Exercise tracker</h1>
+      <h1>Exercise Tracker!</h1>
+      <p id='sub-header'>Users can create a new user and be given a unique userID. With that userID, input your exercises and then later request a log of them! </p>
       <form action="/api/users" method="post">
         <h3>Create a New User</h3>
-        <p>Input a username and you will be given a corresponding ID for you to use to log exercises. Make sure you save your ID!</p>
+        <p>Input a username and you will be given a corresponding userID for you to use to log exercises. Make sure you save
+          your userID!</p>
         <input id="uname" type="text" name="username" placeholder="username" />
         <input type="submit" value="Submit" />
       </form>
-      
+
       <form id="exercise-form" method="post">
-        <h3>Add exercises</h3>
-        <p><code>POST /api/users/:_id/exercises</code></p>
-        <input id="uid" type="text" name=":_id" placeholder=":_id" />
-        <select name="description" id="desc" type="text" placeholder="description" > <!--onchange="checkValue(this.value)"  -->
+        <h3>Add Exercises</h3>
+        <p>Input the userID given when creating a new user, a description of the exercise, the duration, and a date (if no date, then today's date will be used).</p>
+        <input id="uid" type="text" name=":_id" placeholder=":userID" />
+        <select name="description" id="desc" type="text">
+          <!--onchange="checkValue(this.value)"  -->
           <option value="Running">Running</option>
           <option value="Jogging">Jogging</option>
           <option value="Walking">Walking</option>
           <option value="Biking">Biking</option>
+          <option value="Lifting Weights">Lifting Weights</option>
+          <option value="Swimming">Swimming</option>
+          <option value="HIIT">HIIT</option>
+          <option value="High Intensity Sports">High Intensity Sports</option>
+          <option value="Low Intensity Sports">Low Intensity Sports</option>
           <option value="Other">Other</option>
         </select>
-        <input id="description" type="text" name="description" placeholder="description*" style="display:none" />
         <input id="dur" type="number" name="duration" placeholder="duration* (mins.)" />
-        <input id="date" type="date" name="date" placeholder="date (yyyy-mm-dd)" />
+        <input id="date" type="date" name="date" />
         <input type="submit" value="Submit" />
       </form>
 
-      <div>
+      <div id="get-logs-container">
         <h3>Get Log of Exercises for User</h3>
-        <p>Input a username and you will be given a corresponding ID for you to use to log exercises. Make sure you save your ID!</p>
-        <input id="logID" type="text" name=":_id" placeholder=":_id" value="" />
+        <p>Input the user ID along with any parameters you'd like to get a log of all the user's exercises corresponding with the ID.</p>
+        <input id="logID" type="text" name=":_id" placeholder=":userID" value="" />
         <input id="fromDate" type="date" name="from" placeholder="date (yyyy-mm-dd)" />
         <input id="toDate" type="date" name="to" placeholder="date (yyyy-mm-dd)" />
         <input id="limit" type="number" name="limit" placeholder="limit" />
-        <button id="submitLogs" onclick="callAPI()" />
+        <button id="submitLogs" onclick="callAPI()">Get Log of Exercises</button>
       </div>
 
       <script>
-      function callAPI() {
-        var idInput = document.getElementById("logID").value;
-        var fromInput = document.getElementById("fromDate").value; 
-        var toInput = document.getElementById("toDate").value;
-        var limInput = document.getElementById("limit").value;
-        if (limInput == "") {
-          window.location.href = '/api/users/' + idInput + '/logs?&from=' + fromInput + '&to=' + toInput;
-        } else {
-          window.location.href = '/api/users/' + idInput + '/logs?&from=' + fromInput + '&to=' + toInput + '&limit=' + limInput;
+        function callAPI() {
+          var idInput = document.getElementById("logID").value;
+          var fromInput = document.getElementById("fromDate").value;
+          var toInput = document.getElementById("toDate").value;
+          var limInput = document.getElementById("limit").value;
+          if (limInput == "") {
+            window.location.href = '/api/users/' + idInput + '/logs?&from=' + fromInput + '&to=' + toInput;
+          } else {
+            window.location.href = '/api/users/' + idInput + '/logs?&from=' + fromInput + '&to=' + toInput + '&limit=' + limInput;
+          }
         }
-      }
       </script>
     </div>
     <script>
@@ -76,4 +86,5 @@
       // }
     </script>
   </body>
+
 </html>
