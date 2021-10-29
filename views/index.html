@@ -12,25 +12,51 @@
       <h1>Exercise tracker</h1>
       <form action="/api/users" method="post">
         <h3>Create a New User</h3>
-        <p><code>POST /api/users</code></p>
+        <p>Input a username and you will be given a corresponding ID for you to use to log exercises. Make sure you save your ID!</p>
         <input id="uname" type="text" name="username" placeholder="username" />
         <input type="submit" value="Submit" />
       </form>
+      
       <form id="exercise-form" method="post">
         <h3>Add exercises</h3>
         <p><code>POST /api/users/:_id/exercises</code></p>
         <input id="uid" type="text" name=":_id" placeholder=":_id" />
-        <input id="desc" type="text" name="description" placeholder="description*" />
-        <input id="dur" type="text" name="duration" placeholder="duration* (mins.)" />
-        <input id="date" type="text" name="date" placeholder="date (yyyy-mm-dd)" />
+        <select name="description" id="desc" type="text" placeholder="description" onchange="checkValue(this.value)">
+          <option value="Running">Running</option>
+          <option value="Jogging">Jogging</option>
+          <option value="Walking">Walking</option>
+          <option value="Biking">Biking</option>
+          <option value="Other">Other</option>
+        </select>
+        <input id="description" type="text" name="description" placeholder="description*" style="display:none" />
+        <input id="dur" type="number" name="duration" placeholder="duration* (mins.)" />
+        <input id="date" type="date" name="date" placeholder="date (yyyy-mm-dd)" />
         <input type="submit" value="Submit" />
       </form>
-      <p>
-        <strong>GET user's exercise log: </strong>
-        <code>GET /api/users/:_id/logs?[from][&amp;to][&amp;limit]</code>
-      </p>
-      <p><strong>[ ]</strong> = optional</p>
-      <p><strong>from, to</strong> = dates (yyyy-mm-dd); <strong>limit</strong> = number</p>
+
+      <div>
+        <h3>Get Log of Exercises for User</h3>
+        <p>Input a username and you will be given a corresponding ID for you to use to log exercises. Make sure you save your ID!</p>
+        <input id="logID" type="text" name=":_id" placeholder=":_id" value="" />
+        <input id="fromDate" type="date" name="from" placeholder="date (yyyy-mm-dd)" />
+        <input id="toDate" type="date" name="to" placeholder="date (yyyy-mm-dd)" />
+        <input id="limit" type="number" name="limit" placeholder="limit" />
+        <button id="submitLogs" onclick="callAPI()" />
+      </div>
+
+      <script>
+      function callAPI() {
+        var idInput = document.getElementById("logID").value;
+        var fromInput = document.getElementById("fromDate").value; 
+        var toInput = document.getElementById("toDate").value;
+        var limInput = document.getElementById("limit").value;
+        if (limInput == "") {
+          window.location.href = '/api/users/' + idInput + '/logs?&from=' + fromInput + '&to=' + toInput;
+        } else {
+          window.location.href = '/api/users/' + idInput + '/logs?&from=' + fromInput + '&to=' + toInput + '&limit=' + limInput;
+        }
+      }
+      </script>
     </div>
     <script>
       const exerciseForm = document.getElementById("exercise-form");
@@ -41,6 +67,13 @@
 
         exerciseForm.submit();
       });
+
+      function checkValue(val) {
+        if(val==="Other")
+          document.getElementById('description').style.display='block';
+        else
+          document.getElementById('description').style.display='none'; 
+      }
     </script>
   </body>
 </html>

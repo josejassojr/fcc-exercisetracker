@@ -88,9 +88,7 @@ app.get("/api/users", function (req, res) {
 app.post("/api/users/:_id/exercises", function (req, res) {
   console.log(req.body);
   console.log(req.params._id);
-  if (req.body.description === "") {
-    return res.send("'Description' is required.")
-  } else if (req.body.duration === "") {
+  if (req.body.duration === "") {
     return res.send("'Duration' is required.")
   }
   user.findById(req.params._id, function handleFindUser(err, data) {
@@ -105,7 +103,14 @@ app.post("/api/users/:_id/exercises", function (req, res) {
       createdExercise.userID = req.params._id;
       createdExercise.date = convertToDateString(req.body.date);
       createdExercise.duration = req.body.duration;
-      createdExercise.description = req.body.description;
+      if (req.body.description[0] === "Other") {
+        if (req.body.description[1] === "") {
+          return res.send("Must include description if other");
+        }
+        createdExercise.description = req.body.description[1];
+      } else {
+        createdExercise.description = req.body.description[0];
+      }
       const foundUsername = data.username;
       createdExercise.save(function handleSaveExercise(err, data) {
         if (err) {
@@ -163,27 +168,11 @@ app.get("/api/users/:_id/logs", function(req, res) {
             date: exer.date
           }));
           return res.json(paramsToFilteredLog(req.query.from, req.query.to, req.query.limit, exerciseLog, foundUsername, foundUserID));
-          // const logCount = exerciseLog.length;
-          // return res.json({
-          //   _id: foundUserID,
-          //   username: foundUsername,
-          //   count: logCount,
-          //   log: exerciseLog
-          // });
         }
       });
     }
   });
 });
-
-// REGEX PATTERN FOR YYYY-MM-DD
-// ^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$ 
-
-// // GET request to /api/users/:_id/logs?[from][&to][&limit] responds with user and log of user's exercises within dates and set to limited number
-// app.get("/api/users/:_id/logs?[from][&to][&limit]", function (req, res) {
-//   console.log(req.params);
-//   res.send("Hello");
-// });
 
 // OTHER FUNCTIONS
 
