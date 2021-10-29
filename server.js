@@ -124,7 +124,7 @@ app.post("/api/users/:_id/exercises", function (req, res) {
             username: foundUsername,
             date: data.date,
             duration: data.duration,
-            description: data.description
+            description: String(data.description)
           });
         }
       })
