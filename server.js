@@ -91,6 +91,9 @@ app.post("/api/users/:_id/exercises", function (req, res) {
   if (req.body.duration === "") {
     return res.send("'Duration' is required.")
   }
+  if (req.body.description === "") {
+    return res.send("'Description' is required.")
+  }
   user.findById(req.params._id, function handleFindUser(err, data) {
     if (err) {
       console.log(err);
@@ -103,14 +106,15 @@ app.post("/api/users/:_id/exercises", function (req, res) {
       createdExercise.userID = req.params._id;
       createdExercise.date = convertToDateString(req.body.date);
       createdExercise.duration = req.body.duration;
-      if (req.body.description[0] === "Other") {
-        if (req.body.description[1] === "") {
-          return res.send("Must include description if other");
-        }
-        createdExercise.description = req.body.description[1];
-      } else {
-        createdExercise.description = req.body.description[0];
-      }
+      createdExercise.description = req.body.description;
+      // if (req.body.description[0] === "Other") {
+      //   if (req.body.description[1] === "") {
+      //     return res.send("Must include description if other");
+      //   }
+      //   createdExercise.description = req.body.description[1];
+      // } else {
+      //   createdExercise.description = req.body.description[0];
+      // }
       const foundUsername = data.username;
       createdExercise.save(function handleSaveExercise(err, data) {
         if (err) {
@@ -124,7 +128,7 @@ app.post("/api/users/:_id/exercises", function (req, res) {
             username: foundUsername,
             date: data.date,
             duration: data.duration,
-            description: String(data.description)
+            description: data.description
           });
         }
       })

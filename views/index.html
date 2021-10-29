@@ -21,7 +21,7 @@
         <h3>Add exercises</h3>
         <p><code>POST /api/users/:_id/exercises</code></p>
         <input id="uid" type="text" name=":_id" placeholder=":_id" />
-        <select name="description" id="desc" type="text" placeholder="description" onchange="checkValue(this.value)">
+        <select name="description" id="desc" type="text" placeholder="description" > <!--onchange="checkValue(this.value)"  -->
           <option value="Running">Running</option>
           <option value="Jogging">Jogging</option>
           <option value="Walking">Walking</option>
@@ -68,12 +68,12 @@
         exerciseForm.submit();
       });
 
-      function checkValue(val) {
-        if(val==="Other")
-          document.getElementById('description').style.display='block';
-        else
-          document.getElementById('description').style.display='none'; 
-      }
+      // function checkValue(val) {
+      //   if(val==="Other")
+      //     document.getElementById('description').style.display='block';
+      //   else
+      //     document.getElementById('description').style.display='none'; 
+      // }
     </script>
   </body>
 </html>
