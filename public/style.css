@@ -3,17 +3,17 @@
 }
 
 body {
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   margin: 25px;
   color: #222;
-  background-color: #2BD591;
+  background-color: #2bd591;
 }
 #sub-header {
   font-size: 1.75vw;
   font-weight: 600;
 }
 h1 {
-  font-weight: bold; 
+  font-weight: bold;
 }
 h3 {
   font-size: 2vw;
@@ -22,42 +22,89 @@ h3 {
   max-width: 900px;
 } */
 
-form, #get-logs-container {
+form,
+#get-logs-container {
   margin-bottom: 25px;
   padding: 15px;
-  background-color: #2AC07F;
+  background-color: #2ac07f;
   display: inline-block;
   width: 100%;
   max-width: 340px;
   border-radius: 1vw;
-  border: 1vw solid #2A6041;
+  border: 1vw solid #2a6041;
 }
 
-input, #desc,#submitLogs {
+input,
+#desc,
+#submitLogs {
   display: block;
   margin-bottom: 10px;
   padding: 5px;
   width: 100%;
   border: 1px solid lightgrey;
-  border-radius: .5vw;
+  border-radius: 0.5vw;
   font-size: 16px;
   color: #222;
 }
 
-input[type=submit], #submitLogs {
+input[type="submit"],
+#submitLogs {
   font-size: 1.35vw;
-  border-radius: .5vw;
-  background-color: #2BCB88;
-  border: 1px solid #2A6041;
-  box-shadow: 2px 2px #2A6041;
+  border-radius: 0.5vw;
+  background-color: #2bcb88;
+  border: 1px solid #2a6041;
+  box-shadow: 2px 2px #2a6041;
   cursor: pointer;
 }
-input[type=submit]:active {
-  transform: translateY(2px)
+input[type="submit"]:active {
+  transform: translateY(2px);
 }
 #submitLogs:active {
-  transform: translateY(2px)
+  transform: translateY(2px);
 }
 
+footer {
+  display: flex;
+  flex-direction: row;
+  font-style: italic;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: 11px;
+  width: 300px;
+  justify-content: space-around;
+  margin: auto;
+  margin-top: 100px;
+  margin-bottom: 50px;
+}
 
+#footer-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 50%;
+}
+.footer-button,
+footer {
+  color: rgba(8, 7, 7, 0.527);
+}
 
+/* Larger Views (Like Monitors and such) */
+@media (min-width: 1600px) {
+  footer {
+    font-size: 13px;
+    width: 500px;
+  }
+}
+@media (min-width: 2560px) {
+  footer {
+    font-size: 24px;
+    width: 600px;
+  }
+}
+
+/* Mobile View */
+@media (max-width: 600px) {
+  footer {
+    margin-top: 50px;
+  }
+}

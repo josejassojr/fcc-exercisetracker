@@ -1,30 +1,49 @@
 <!DOCTYPE html>
 <html>
-
   <head>
     <title>Exercise Tracker</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto"
+      rel="stylesheet"
+      type="text/css"
+    />
     <link href="style.css" rel="stylesheet" type="text/css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/909ca40244.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
 
   <body>
     <div class="container">
       <h1>Exercise Tracker!</h1>
-      <p id='sub-header'>Users can create a new user and be given a unique userID. With that userID, input your exercises and then later request a log of them! </p>
+      <p id="sub-header">
+        Users can create a new user and be given a unique userID. With that
+        userID, input your exercises and then later request a log of them!
+      </p>
       <form action="/api/users" method="post">
         <h3>Create a New User</h3>
-        <p>Input a username and you will be given a corresponding userID for you to use to log exercises. Make sure you save
-          your userID!</p>
+        <p>
+          Input a username and you will be given a corresponding userID for you
+          to use to log exercises. Make sure you save your userID!
+        </p>
         <input id="uname" type="text" name="username" placeholder="username" />
         <input type="submit" value="Submit" />
       </form>
 
       <form id="exercise-form" method="post">
         <h3>Add Exercises</h3>
-        <p>Input the userID given when creating a new user, a description of the exercise, the duration, and a date (if no date, then today's date will be used).</p>
+        <p>
+          Input the userID given when creating a new user, a description of the
+          exercise, the duration, and a date (if no date, then today's date will
+          be used).
+        </p>
         <input id="uid" type="text" name=":_id" placeholder=":userID" />
         <select name="description" id="desc" type="text">
           <!--onchange="checkValue(this.value)"  -->
@@ -39,19 +58,45 @@
           <option value="Low Intensity Sports">Low Intensity Sports</option>
           <option value="Other">Other</option>
         </select>
-        <input id="dur" type="number" name="duration" placeholder="duration* (mins.)" />
+        <input
+          id="dur"
+          type="number"
+          name="duration"
+          placeholder="duration* (mins.)"
+        />
         <input id="date" type="date" name="date" />
         <input type="submit" value="Submit" />
       </form>
 
       <div id="get-logs-container">
         <h3>Get Log of Exercises for User</h3>
-        <p>Input the user ID along with any parameters you'd like to get a log of all the user's exercises corresponding with the ID.</p>
-        <input id="logID" type="text" name=":_id" placeholder=":userID" value="" />
-        <input id="fromDate" type="date" name="from" placeholder="date (yyyy-mm-dd)" />
-        <input id="toDate" type="date" name="to" placeholder="date (yyyy-mm-dd)" />
+        <p>
+          Input the user ID along with any parameters you'd like to get a log of
+          all the user's exercises corresponding with the ID.
+        </p>
+        <input
+          id="logID"
+          type="text"
+          name=":_id"
+          placeholder=":userID"
+          value=""
+        />
+        <input
+          id="fromDate"
+          type="date"
+          name="from"
+          placeholder="date (yyyy-mm-dd)"
+        />
+        <input
+          id="toDate"
+          type="date"
+          name="to"
+          placeholder="date (yyyy-mm-dd)"
+        />
         <input id="limit" type="number" name="limit" placeholder="limit" />
-        <button id="submitLogs" onclick="callAPI()">Get Log of Exercises</button>
+        <button id="submitLogs" onclick="callAPI()">
+          Get Log of Exercises
+        </button>
       </div>
 
       <script>
@@ -61,9 +106,23 @@
           var toInput = document.getElementById("toDate").value;
           var limInput = document.getElementById("limit").value;
           if (limInput == "") {
-            window.location.href = '/api/users/' + idInput + '/logs?&from=' + fromInput + '&to=' + toInput;
+            window.location.href =
+              "/api/users/" +
+              idInput +
+              "/logs?&from=" +
+              fromInput +
+              "&to=" +
+              toInput;
           } else {
-            window.location.href = '/api/users/' + idInput + '/logs?&from=' + fromInput + '&to=' + toInput + '&limit=' + limInput;
+            window.location.href =
+              "/api/users/" +
+              idInput +
+              "/logs?&from=" +
+              fromInput +
+              "&to=" +
+              toInput +
+              "&limit=" +
+              limInput;
           }
         }
       </script>
@@ -82,9 +141,45 @@
       //   if(val==="Other")
       //     document.getElementById('description').style.display='block';
       //   else
-      //     document.getElementById('description').style.display='none'; 
+      //     document.getElementById('description').style.display='none';
       // }
     </script>
   </body>
-
+  <footer>
+    Created by Jose Jasso Jr.
+    <div id="footer-buttons">
+      <a
+        href="https://www.josejassojr.com/"
+        target="_blank"
+        rel="noreferrer"
+        class="footer-button"
+      >
+        <i class="fas fa-laptop-code"></i>
+      </a>
+      <a
+        href="https://www.linkedin.com/in/josejassojr/"
+        target="_blank"
+        rel="noreferrer"
+        class="footer-button"
+      >
+        <i class="fab fa-linkedin"></i>
+      </a>
+      <a
+        href="https://github.com/josejassojr"
+        target="_blank"
+        rel="noreferrer"
+        class="footer-button"
+      >
+        <i class="fab fa-github"></i>
+      </a>
+      <a
+        href="mailto:jose.d.jassojr@gmail.com"
+        target="_blank"
+        rel="noreferrer"
+        class="footer-button"
+      >
+        <i class="far fa-envelope"></i>
+      </a>
+    </div>
+  </footer>
 </html>
