@@ -1,35 +1,35 @@
 // Requirements and Basic Configuration
 
-const express = require('express')
-const app = express()
-const cors = require('cors')
-const mongoose = require('mongoose');
+const express = require("express");
+const app = express();
+const cors = require("cors");
+const mongoose = require("mongoose");
 var bodyParser = require("body-parser");
-require("dotenv").config({ path: "sample.env" });
+// require("dotenv").config({ path: "sample.env" });
 
 app.use(cors());
-app.use(express.static('public'));
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/views/index.html')
+app.use(express.static("public"));
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/views/index.html");
 });
 const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
+  console.log("Your app is listening on port " + listener.address().port);
 });
 
-// urlencoding? 
+// urlencoding?
 var func = bodyParser.urlencoded({ extended: false });
 app.use(func);
 
 // Configuration of MongoDB/Mongoose
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 });
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   username: { type: String, required: true },
-  _id: { type: String, required: true }
+  _id: { type: String, required: true },
 });
 
 const user = mongoose.model("User", userSchema);
@@ -37,8 +37,8 @@ const user = mongoose.model("User", userSchema);
 const exerciseSchema = new Schema({
   userID: { type: String, required: true },
   date: { type: String, required: true },
-  duration: { type: Number, required: true},
-  description: { type: String, required: true }
+  duration: { type: Number, required: true },
+  description: { type: String, required: true },
 });
 
 const exercise = mongoose.model("Exercise", exerciseSchema);
@@ -63,7 +63,7 @@ app.post("/api/users", function (req, res) {
       console.log(data);
       return res.json({
         username: newUsername,
-        _id: newID
+        _id: newID,
       });
     }
   });
@@ -73,15 +73,17 @@ app.post("/api/users", function (req, res) {
 app.get("/api/users", function (req, res) {
   user.find(function (err, data) {
     if (err) {
-      console.log(err) 
+      console.log(err);
       return res.json({ error: "error in retrieving all users" });
     } else {
-      console.log(data)
-      const allUsers = data.map(user => (
-        { _id: user._id, username: user.username }));
+      console.log(data);
+      const allUsers = data.map((user) => ({
+        _id: user._id,
+        username: user.username,
+      }));
       return res.send(allUsers);
     }
-  })
+  });
 });
 
 // POST request to /api/users/:id/exercises sends exercise document to DB with properties: _id, date, duration, and description
@@ -89,19 +91,21 @@ app.post("/api/users/:_id/exercises", function (req, res) {
   console.log(req.body);
   console.log(req.params._id);
   if (req.body.duration === "") {
-    return res.send("'Duration' is required.")
+    return res.send("'Duration' is required.");
   }
   if (req.body.description === "") {
-    return res.send("'Description' is required.")
+    return res.send("'Description' is required.");
   }
   user.findById(req.params._id, function handleFindUser(err, data) {
     if (err) {
       console.log(err);
       console.log("Error Finding User by ID");
       return res.send("Error Finding User by ID");
-    } else if (data === null) { // did not find User with that ID
+    } else if (data === null) {
+      // did not find User with that ID
       return res.send("Unknown UserID");
-    } else { // User found. Proceed to save Exercise.
+    } else {
+      // User found. Proceed to save Exercise.
       let createdExercise = new exercise();
       createdExercise.userID = req.params._id;
       createdExercise.date = convertToDateString(req.body.date);
@@ -128,10 +132,10 @@ app.post("/api/users/:_id/exercises", function (req, res) {
             username: foundUsername,
             date: data.date,
             duration: data.duration,
-            description: data.description
+            description: data.description,
           });
         }
-      })
+      });
     }
   });
 });
@@ -139,10 +143,10 @@ app.post("/api/users/:_id/exercises", function (req, res) {
 // If no _id is input to post exercise.
 app.post("/api/users//exercises", function (req, res) {
   res.send("need ID");
-})
+});
 
 // GET request to /api/users/:id/logs responds with user and log of all user's exercises
-app.get("/api/users/:_id/logs", function(req, res) {
+app.get("/api/users/:_id/logs", function (req, res) {
   console.log(req.params);
   console.log(req.params._id);
   console.log(req.query);
@@ -157,23 +161,32 @@ app.get("/api/users/:_id/logs", function(req, res) {
     } else {
       const foundUsername = data.username;
       const foundUserID = data._id;
-      exercise.find({ userID: foundUserID }, function handleFoundExerciseLog(
-        err,
-        data
-      ) {
-        if (err) {
-          console.log(err);
-          console.log("Error in finding Exercise Log");
-          return res.send("Error in finding Exercise Log");
-        } else {
-          let exerciseLog = data.map(exer => ({
-            description: exer.description,
-            duration: exer.duration,
-            date: exer.date
-          }));
-          return res.json(paramsToFilteredLog(req.query.from, req.query.to, req.query.limit, exerciseLog, foundUsername, foundUserID));
+      exercise.find(
+        { userID: foundUserID },
+        function handleFoundExerciseLog(err, data) {
+          if (err) {
+            console.log(err);
+            console.log("Error in finding Exercise Log");
+            return res.send("Error in finding Exercise Log");
+          } else {
+            let exerciseLog = data.map((exer) => ({
+              description: exer.description,
+              duration: exer.duration,
+              date: exer.date,
+            }));
+            return res.json(
+              paramsToFilteredLog(
+                req.query.from,
+                req.query.to,
+                req.query.limit,
+                exerciseLog,
+                foundUsername,
+                foundUserID
+              )
+            );
+          }
         }
-      });
+      );
     }
   });
 });
@@ -188,38 +201,34 @@ function convertToDateString(input) {
   } else {
     date = new Date(input);
   }
-  utc_date = [
-    date.getUTCFullYear(),
-    date.getUTCMonth() + 1,
-    date.getUTCDate()
-  ];
+  utc_date = [date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate()];
   return new Date(utc_date).toDateString();
 }
 
 // Returns Object from given Parameters: From Date, To Date, Limit, Log, username, userID
 function paramsToFilteredLog(from, to, limit, log, username, userID) {
-  let retLog = log
+  let retLog = log;
   // console.log(retLog);
   // console.log(new Date(from));
   // console.log(new Date(to));
   let x = "";
   if (new Date(from) != "Invalid Date") {
-    x += "f"
+    x += "f";
     var retFrom = convertDateToUTCDate(new Date(from));
-    retLog = retLog.filter(item => new Date(item.date) >= retFrom);
+    retLog = retLog.filter((item) => new Date(item.date) >= retFrom);
     // console.log(retLog);
   }
   if (new Date(to) != "Invalid Date") {
-    x += "t"
+    x += "t";
     var retTo = convertDateToUTCDate(new Date(to));
-    retLog = retLog.filter(item => new Date(item.date) <= retTo);
+    retLog = retLog.filter((item) => new Date(item.date) <= retTo);
     // console.log(retLog);
   }
   if (limit !== undefined) {
     retLog = retLog.slice(0, limit);
     // console.log(retLog);
   }
-  const logCount = retLog.length
+  const logCount = retLog.length;
   // console.log(x)
   switch (x) {
     case "f":
@@ -228,7 +237,7 @@ function paramsToFilteredLog(from, to, limit, log, username, userID) {
         username: username,
         from: retFrom.toDateString(),
         count: logCount,
-        log: retLog
+        log: retLog,
       };
     case "ft":
       return {
@@ -237,22 +246,22 @@ function paramsToFilteredLog(from, to, limit, log, username, userID) {
         from: retFrom.toDateString(),
         to: retTo.toDateString(),
         count: logCount,
-        log: retLog
+        log: retLog,
       };
-    case 't':
+    case "t":
       return {
         _id: userID,
         username: username,
         to: retTo.toDateString(),
         count: logCount,
-        log: retLog
+        log: retLog,
       };
     default:
       return {
         _id: userID,
         username: username,
         count: logCount,
-        log: retLog
+        log: retLog,
       };
   }
 }
@@ -262,7 +271,6 @@ function convertDateToUTCDate(date) {
   utc_date = [date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate()];
   return new Date(utc_date);
 }
-
 
 // Tests
 
@@ -283,7 +291,7 @@ function convertDateToUTCDate(date) {
 //     { description: "Testing", duration: 13, date: "Sun Oct 21 2001" },
 //     { description: "Testing", duration: 14, date: "Sun Oct 21 2001" }
 //   ];
-//   console.log( 
+//   console.log(
 //     paramsToFilteredLog( // Just From Date
 //       "2021-10-21",
 //       undefined,
@@ -337,5 +345,4 @@ function convertDateToUTCDate(date) {
 // console.log(convertToDateString("2020-10-29"));
 // console.log(convertToDateString("2021"));
 // console.log(convertToDateString());
-// console.log(convertToDateString("")); 
-
+// console.log(convertToDateString(""));
